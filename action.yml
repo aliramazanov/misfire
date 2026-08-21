@@ -1,0 +1,54 @@
+name: misfire
+description: Fail a pull request that weakens its test suite
+author: Ali Ramazanov
+
+branding:
+  icon: crosshair
+  color: red
+
+inputs:
+  base:
+    description: Ref to compare against
+    required: false
+    default: ${{ github.event.pull_request.base.ref && format('origin/{0}', github.event.pull_request.base.ref) || 'origin/main' }}
+  min-confidence:
+    description: Lowest confidence that fails the build (low, medium, high)
+    required: false
+    default: medium
+  baseline:
+    description: Path to a baseline file of accepted findings
+    required: false
+    default: ""
+  annotate:
+    description: Emit inline pull request annotations
+    required: false
+    default: "true"
+  version:
+    description: misfire version to install
+    required: false
+    default: latest
+
+runs:
+  using: composite
+  steps:
+    - name: Install misfire
+      shell: bash
+      run: |
+        if [ "${{ inputs.version }}" = "latest" ]; then
+          cargo install misfire --locked
+        else
+          cargo install misfire --locked --version "${{ inputs.version }}"
+        fi
+
+    - name: Run misfire
+      shell: bash
+      run: |
+        args=(--base "${{ inputs.base }}" --min-confidence "${{ inputs.min-confidence }}")
+        if [ -n "${{ inputs.baseline }}" ]; then
+          args+=(--baseline "${{ inputs.baseline }}")
+        fi
+
+        if [ "${{ inputs.annotate }}" = "true" ]; then
+          misfire "${args[@]}" --github || true
+        fi
+        misfire "${args[@]}"

@@ -1,0 +1,62 @@
+[package]
+name = "misfire"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "MIT"
+description = "Catches when a diff makes your tests misfire"
+repository = "https://github.com/aliramazanov/misfire"
+keywords = ["testing", "ci", "code-review", "static-analysis"]
+categories = ["command-line-utilities", "development-tools::testing"]
+exclude = [".github/", ".vscode/", "action.yml"]
+
+[dependencies]
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "fmt", "time"] }
+opentelemetry = { version = "0.32", optional = true }
+opentelemetry_sdk = { version = "0.32", features = ["rt-tokio"], optional = true }
+opentelemetry-otlp = { version = "0.32", features = ["grpc-tonic"], optional = true }
+tracing-opentelemetry = { version = "0.33", optional = true }
+tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
+clap = { version = "4", features = ["derive", "env"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.9"
+globset = "0.4"
+tree-sitter = "0.25.10"
+tree-sitter-go = "0.25"
+tree-sitter-rust = "0.24"
+
+[features]
+default = []
+otel = [
+    "dep:opentelemetry",
+    "dep:opentelemetry_sdk",
+    "dep:opentelemetry-otlp",
+    "dep:tracing-opentelemetry",
+    "dep:tokio",
+]
+
+[dev-dependencies]
+serde_json = "1"
+tempfile = "3"
+toml = "0.9"
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+use_self = "warn"
+redundant_clone = "warn"
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+doc_markdown = "allow"
+must_use_candidate = "allow"
+
+[profile.release]
+lto = true
+strip = true
