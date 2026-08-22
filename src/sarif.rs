@@ -49,7 +49,7 @@ pub fn build(findings: &[Finding]) -> Value {
 }
 
 fn uri_reference(path: &str) -> String {
-    const UNRESERVED_EXTRA: [u8; 5] = [b'-', b'.', b'_', b'~', b'/'];
+    const UNRESERVED_EXTRA: [u8; 5] = *b"-._~/";
 
     let mut out = String::with_capacity(path.len());
 

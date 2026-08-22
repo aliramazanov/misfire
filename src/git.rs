@@ -140,8 +140,7 @@ impl Repo {
 
     fn is_shallow(&self) -> bool {
         self.git(&["rev-parse", "--is-shallow-repository"])
-            .map(|s| s.trim() == "true")
-            .unwrap_or(false)
+            .is_ok_and(|s| s.trim() == "true")
     }
 
     fn resolve_rev(&self, base: &str) -> Option<String> {
